@@ -79,6 +79,22 @@ public class Application extends WebMvcConfigurerAdapter implements
     return exec(cmd);
   }
 
+  //开启服务 url规则：host/api/server/start?serverName=
+  @RequestMapping(value = "/api/server/start", method = RequestMethod.GET)
+  @ResponseBody
+  public String startServer(String serverName) throws Exception {
+    String cmd = "sudo /opt/" + serverName + "/bin/start.sh";
+    return exec(cmd);
+  }
+
+  //关闭服务 url规则：host/api/server/stop?serverName=
+  @RequestMapping(value = "/api/server/stop", method = RequestMethod.GET)
+  @ResponseBody
+  public String closeServer(String serverName) throws Exception {
+    String cmd = "sudo /opt/" + serverName + "/bin/stop.sh";
+    return exec(cmd);
+  }
+
   // 关闭本服务
   @RequestMapping(value = "/api/closeme", method = RequestMethod.GET)
   @ResponseBody
