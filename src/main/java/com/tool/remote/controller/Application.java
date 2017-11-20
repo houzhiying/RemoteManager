@@ -95,6 +95,31 @@ public class Application extends WebMvcConfigurerAdapter implements
     return exec(cmd);
   }
 
+  @RequestMapping(value = "/api/server/restart/tether", method = RequestMethod.GET)
+  @ResponseBody
+  public String restartTether() throws Exception {
+    String cmd1 = "sudo rm -rf /data/logs/yz-tether/tether.log";
+    String cmd2 = "sudo supervisorctl restart Tether:Tether-1";
+    //删除tether.log
+    exec(cmd1);
+    //重启tether服务
+    return exec(cmd2);
+  }
+
+  @RequestMapping(value = "/api/log/tether/clean", method = RequestMethod.GET)
+  @ResponseBody
+  public String cleanFile() throws Exception {
+    String cmd = "sudo su - app && echo '' > /data/logs/yz-tether/tether.log";
+    return exec(cmd);
+  }
+
+  @RequestMapping(value = "/api/count/log", method = RequestMethod.GET)
+  @ResponseBody
+  public String countLogs(String keywords) throws Exception {
+    String cmd = "cat /data/logs/yz-tether/tether.log | grep -o " + keywords + " | wc -l";
+    return exec(cmd);
+  }
+
   // 关闭本服务
   @RequestMapping(value = "/api/closeme", method = RequestMethod.GET)
   @ResponseBody

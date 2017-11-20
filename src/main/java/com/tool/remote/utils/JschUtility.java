@@ -27,7 +27,7 @@ public class JschUtility {
     System.out.println("Start to execute command: " + cmd);
     try {
       // 使用Runtime来执行command，生成Process对象
-      process = Runtime.getRuntime().exec(cmd);
+      process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", cmd + " 2>&1"});
       // 取得命令结果的输出流
       InputStream is = process.getInputStream();
       // 用一个读输出流类去读
