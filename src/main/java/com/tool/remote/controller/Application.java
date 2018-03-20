@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
@@ -45,7 +46,7 @@ public class Application extends WebMvcConfigurerAdapter implements
   public String portOpt(@PathVariable String id, final Boolean open) throws Exception {
     String cmd = null;
     if (open) {
-      cmd = String.format(prop.getProperty("port.enable"), id);
+      cmd = prop.getProperty("port.enable");
 
     } else {
       cmd = String.format(prop.getProperty("port.disable"), id);
@@ -58,6 +59,24 @@ public class Application extends WebMvcConfigurerAdapter implements
     return exec(cmd);
   }
 
+  // ip操作     url规则：host/api/ip/10.9.97.221/?open=true
+  @RequestMapping(value = "/api/ip/{ip}/", method = RequestMethod.GET)
+  @ResponseBody
+  public String ipOpt(@PathVariable String ip, final Boolean open) throws Exception {
+    String cmd = null;
+    if (open) {
+      cmd = prop.getProperty("ip.enable");
+
+    } else {
+      cmd = String.format(prop.getProperty("ip.disable"), ip);
+    }
+
+    if (null == cmd) {
+      throw new IllegalArgumentException("command cannot be found!");
+    }
+
+    return exec(cmd);
+  }
 
   // 进程操作   url规则：host/api/process/8788?start=true
   @RequestMapping(value = "/api/process/{id}", method = RequestMethod.GET)
@@ -99,7 +118,7 @@ public class Application extends WebMvcConfigurerAdapter implements
   @ResponseBody
   public String restartTether() throws Exception {
     String cmd1 = "sudo rm -rf /data/logs/yz-tether/tether.log";
-    String cmd2 = "sudo supervisorctl restart Tether:Tether-1";
+    String cmd2 = "sudo /opt/python/bin/supervisorctl restart yz-tether:yz-tether-1";
     //删除tether.log
     exec(cmd1);
     //重启tether服务
@@ -120,6 +139,17 @@ public class Application extends WebMvcConfigurerAdapter implements
     return exec(cmd);
   }
 
+  @RequestMapping(value = "/api/yz7/action/cors", method = RequestMethod.GET)
+  @ResponseBody
+  public String testCors(HttpServletResponse response) {
+    response.addHeader("Access-Control-Allow-Origin", "http://1234.example.com");
+    response.addHeader("Access-Control-Allow-Methods", "OPTIONS,HEAD,GET,POST,PUT,DELETE");
+    response.addHeader("Access-Control-Allow-Credentials", "true");
+    response.addHeader("Access-Control-Max-Age", "86400");
+    response.addHeader("Access-Control-Expose-Headers", "x-req-id,x-z-id");
+    return "Hello World";
+  }
+
   // 关闭本服务
   @RequestMapping(value = "/api/closeme", method = RequestMethod.GET)
   @ResponseBody
@@ -131,7 +161,7 @@ public class Application extends WebMvcConfigurerAdapter implements
   // 容器开启80端口
   @Override
   public void customize(ConfigurableEmbeddedServletContainer container) {
-    container.setPort(80);
+    container.setPort(8089);
   }
 
   @Override

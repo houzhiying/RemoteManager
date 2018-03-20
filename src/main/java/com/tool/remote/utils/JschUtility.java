@@ -46,6 +46,10 @@ public class JschUtility {
       br.close();
 
       int exitCode = process.waitFor();
+      if (exitCode != 0) {
+        System.out.println("error code : " + exitCode);
+        throw new RuntimeException();
+      }
 
     } catch (NullPointerException e) {
       System.err.println("NullPointerException " + e.getMessage());
@@ -55,7 +59,6 @@ public class JschUtility {
     } finally {
       process.destroy();
     }
-
     return sb.toString();
   }
 
