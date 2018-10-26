@@ -65,7 +65,7 @@ public class Application extends WebMvcConfigurerAdapter implements
   @RequestMapping(value = "/api/ip/{ip}/port/{port}", method = RequestMethod.GET)
   @ResponseBody
   public String ipAndPortOpt(@PathVariable String ip, @PathVariable String port) throws Exception {
-    String cmd = "sudo iptables -I OUTPUT -d " + ip + " -p tcp  --dport " + port + " -j DROP";
+    String cmd = "sudo iptables -I OUTPUT -d " + ip + " -p tcp  --dport " + port + " -j REJECT --reject-with tcp-reset";
     return exec(cmd);
   }
 
@@ -304,6 +304,20 @@ public class Application extends WebMvcConfigurerAdapter implements
     return "Hello World";
   }
 
+  /*******************************************DTS测试*******************************************/
+  @RequestMapping(value = "/api/server/sinker/start", method = RequestMethod.GET)
+  @ResponseBody
+  public void startSinker() throws Exception {
+    String cmd = "cd /tmp && bash /tmp/jenkins-ci.sh";
+    exec(cmd);
+  }
+
+  @RequestMapping(value = "/api/server/sinker/stop", method = RequestMethod.GET)
+  @ResponseBody
+  public void stopSinker() throws Exception {
+    String cmd = "netstat -anput | grep 8085 | awk -F'/' '{print $1}' | awk '{print $7}' | xargs kill -9";
+    exec(cmd);
+  }
 
   // 关闭本服务
   @RequestMapping(value = "/api/closeme", method = RequestMethod.GET)
@@ -315,7 +329,7 @@ public class Application extends WebMvcConfigurerAdapter implements
   // 容器开启80端口
   @Override
   public void customize(ConfigurableEmbeddedServletContainer container) {
-    container.setPort(8089);
+    container.setPort(8090);
   }
 
   @Override
