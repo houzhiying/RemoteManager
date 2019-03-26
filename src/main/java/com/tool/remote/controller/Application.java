@@ -65,7 +65,8 @@ public class Application extends WebMvcConfigurerAdapter implements
   @RequestMapping(value = "/api/ip/{ip}/port/{port}", method = RequestMethod.GET)
   @ResponseBody
   public String ipAndPortOpt(@PathVariable String ip, @PathVariable String port) throws Exception {
-    String cmd = "sudo iptables -I OUTPUT -d " + ip + " -p tcp  --dport " + port + " -j REJECT --reject-with tcp-reset";
+    String cmd = "sudo iptables -I OUTPUT -d " + ip + " -p tcp  --dport " + port
+        + " -j REJECT --reject-with tcp-reset";
     return exec(cmd);
   }
 
@@ -229,6 +230,28 @@ public class Application extends WebMvcConfigurerAdapter implements
   }
 
   /*******************************************tether 测试*******************************************/
+  //开启etcd
+  // url规则：host/api/etcd/start
+  @RequestMapping(value = "/api/etcd/start", method = RequestMethod.GET)
+  @ResponseBody
+  public void startEtcd() throws Exception {
+    exec("sudo /opt/python/bin/supervisorctl start etcd0");
+    exec("sudo /opt/python/bin/supervisorctl start etcd1");
+    exec("sudo /opt/python/bin/supervisorctl start etcd2");
+  }
+
+
+  //关闭etcd
+  // url规则：host/api/etcd/stop
+  @RequestMapping(value = "/api/etcd/stop", method = RequestMethod.GET)
+  @ResponseBody
+  public void stopEtcd() throws Exception {
+    exec("sudo /opt/python/bin/supervisorctl stop etcd0");
+    exec("sudo /opt/python/bin/supervisorctl stop etcd1");
+    exec("sudo /opt/python/bin/supervisorctl stop etcd2");
+  }
+
+
   //开启微服务
   // url规则：host/api/server/start?serverName=
   @RequestMapping(value = "/api/server/start", method = RequestMethod.GET)
@@ -304,6 +327,20 @@ public class Application extends WebMvcConfigurerAdapter implements
     return "Hello World";
   }
 
+  @RequestMapping(value = "/api/yz7/server/start", method = RequestMethod.GET)
+  @ResponseBody
+  public void startYz7() throws Exception {
+    String cmd = "sudo /etc/init.d/yz7 start";
+    exec(cmd);
+  }
+
+  @RequestMapping(value = "/api/yz7/server/stop", method = RequestMethod.GET)
+  @ResponseBody
+  public void stopYz7() throws Exception {
+    String cmd = "sudo /etc/init.d/yz7 stop";
+    exec(cmd);
+  }
+
   /*******************************************DTS测试*******************************************/
   @RequestMapping(value = "/api/server/sinker/start", method = RequestMethod.GET)
   @ResponseBody
@@ -329,7 +366,7 @@ public class Application extends WebMvcConfigurerAdapter implements
   // 容器开启80端口
   @Override
   public void customize(ConfigurableEmbeddedServletContainer container) {
-    container.setPort(8090);
+    container.setPort(8089);
   }
 
   @Override
